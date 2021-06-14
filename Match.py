@@ -8,14 +8,19 @@ class Match:
         self.regex = re.compile(r'( - )(\w)(\w*)(\w)')
         self.repl = r' \2*\4'
 
+    def sub(self):
+        result = self.regex.sub(lambda m: ' ' + m.group(2) + '*' * len(m.group(3)) + m.group(4), self.rawString)
+
+        print('\nLambda 運算式：\n"' + result + '"')
+
     def run(self):
-        print('比對模式：\n"{}"'.format(self.regex.pattern))
+        print('比對模式： "{}"'.format(self.regex.pattern))
         print('\n輸入字串：\n"{}"'.format(self.rawString))
 
-        print('\n取代模式：\n"{}"'.format(self.repl))
+        print('\n取代模式： "{}"'.format(self.repl))
         result = self.regex.sub(self.repl, self.rawString)
 
-        print('\n結果字串：\n"' + result + '"')
+        print('\n結果字串：\n"{}"'.format(result))
 
         print('\n反向參考：')
 
@@ -51,14 +56,18 @@ class Match:
 
             prev = m.end()
 
-        print('\n重組反向參考：\n' + ''.join(result))
+        if prev and prev < len(self.rawString):
+            result.append(self.rawString[prev:])
+
+        print('\n重組反向參考：\n"{}"'.format(''.join(result)))
         print('\n比對結果組：\n' + '\n'.join([str(x) for x in self.regex.findall(self.rawString)]))
 
 if __name__ == '__main__':
     ctypes.windll.kernel32.SetConsoleTitleW(sys.implementation.name + ' ' + sys.version)
 
-    Match('The Nobel Prizes were awarded, in - Physics, - Chemistry, - Physiology or Medicine, - Literature and - Peace.') \
-        .run()
+    m = Match('The Nobel Prizes were awarded, in - Physics, - Chemistry, - Physiology or Medicine, - Literature and - Peace.')
+    m.run()
+    m.sub()
 
     print('請按任意鍵繼續 . . . ', end='', flush=True)
     msvcrt.getch()
